@@ -160,7 +160,7 @@ function renderProfileComment(comment) {
 }
 
 // --- Reddit User Profile Banner & 2x2 Stats Card ---
-async function renderUserProfileBanner(author, currentMode, currentBackend) {
+async function renderUserProfileBanner(author, currentMode, currentBackend, resultCount = 0) {
   const container = document.getElementById("content");
   if (!container || !author) return;
 
@@ -170,33 +170,33 @@ async function renderUserProfileBanner(author, currentMode, currentBackend) {
   const bannerDiv = document.createElement("div");
   bannerDiv.id = "user-profile-banner";
   bannerDiv.className = "profile-banner-wrapper";
-  bannerDiv.innerHTML = `<div style="color:#7c7c7c;font-size:14px;">Loading profile for u/${author}...</div>`;
-  container.prepend(bannerDiv);
 
-  let karma = "N/A";
-  let age = "N/A";
+  // Pick a consistent Reddit avatar based on username hash
+  const avatarIndex = (author.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % 8) + 1;
+  let avatarUrl = `https://www.redditstatic.com/avatars/defaults/v2/avatar_default_${avatarIndex}.png`;
+  let karma = "Archived";
+  let age = "Reddit User";
   let isNsfw = "No";
-  let avatarUrl = "https://www.redditstatic.com/avatars/defaults/v2/avatar_default_1.png";
 
+  // Try optional fetch; if Reddit CORS/403 blocks it, silently keep defaults
   try {
     const res = await fetch(`https://www.reddit.com/user/${author}/about.json`);
     if (res.ok) {
       const json = await res.json();
       const userData = json.data;
-      karma = (userData.total_karma || (userData.link_karma + userData.comment_karma) || 0).toLocaleString();
-      if (userData.created_utc) {
-        const diffYears = ((Date.now() / 1000 - userData.created_utc) / 31536000).toFixed(1);
-        age = diffYears >= 1 ? `${Math.floor(diffYears)} y` : `${Math.floor(diffYears * 12)} mo`;
-      }
-      isNsfw = userData.subreddit && userData.subreddit.over_18 ? "Yes" : "No";
-      if (userData.snoovatar_img) {
-        avatarUrl = userData.snoovatar_img;
-      } else if (userData.icon_img) {
-        avatarUrl = userData.icon_img.split("?")[0];
+      if (userData) {
+        karma = (userData.total_karma || (userData.link_karma + userData.comment_karma) || 0).toLocaleString();
+        if (userData.created_utc) {
+          const diffYears = ((Date.now() / 1000 - userData.created_utc) / 31536000).toFixed(1);
+          age = diffYears >= 1 ? `${Math.floor(diffYears)} y` : `${Math.floor(diffYears * 12)} mo`;
+        }
+        isNsfw = userData.subreddit && userData.subreddit.over_18 ? "Yes" : "No";
+        if (userData.snoovatar_img) avatarUrl = userData.snoovatar_img;
+        else if (userData.icon_img) avatarUrl = userData.icon_img.split("?")[0];
       }
     }
-  } catch (err) {
-    console.warn("Could not fetch Reddit profile data:", err);
+  } catch (_) {
+    // Expected on client-side due to Reddit API cross-origin restrictions
   }
 
   const isPosts = currentMode === "submissions" || !currentMode;
@@ -222,7 +222,7 @@ async function renderUserProfileBanner(author, currentMode, currentBackend) {
         <span>${author}</span>
       </div>
       <a href="https://reddit.com/user/${author}" target="_blank" class="reddit-view-btn">
-        💬 Start Chat
+        💬 View on Reddit
       </a>
       <div class="stats-grid-2x2">
         <div class="stat-item">
@@ -230,8 +230,8 @@ async function renderUserProfileBanner(author, currentMode, currentBackend) {
           <span class="stat-label">Karma</span>
         </div>
         <div class="stat-item">
-          <span class="stat-value">${age}</span>
-          <span class="stat-label">Reddit Age</span>
+          <span class="stat-value">${resultCount ? `${resultCount}+` : age}</span>
+          <span class="stat-label">${resultCount ? 'Contributions' : 'Reddit Age'}</span>
         </div>
         <div class="stat-item">
           <span class="stat-value">${isNsfw}</span>
@@ -244,6 +244,8 @@ async function renderUserProfileBanner(author, currentMode, currentBackend) {
       </div>
     </div>
   `;
+
+  container.prepend(bannerDiv);
 }
 
 // --- Pagination ---
@@ -290,44 +292,59 @@ const ArcticShift = {
   baseUrl: "https://arctic-shift.photon-reddit.com",
   
   async getSubmissions(params) {
+    // Whitelist only valid Arctic Shift parameters
+    const allowed = ["author", "subreddit", "title", "selftext", "query", "after", "before", "sort", "limit", "over_18", "spoiler", "author_flair_text", "link_flair_text", "url", "url_exact", "crosspost_parent_id"];
     const qParams = new URLSearchParams();
+
     params.forEach((v, k) => {
-      if (k === "q") qParams.set("query", v);
-      else if (v) qParams.set(k, v);
+      if (k === "q" && v) qParams.set("query", v);
+      else if (allowed.includes(k) && v) qParams.set(k, v);
     });
     if (!qParams.has("limit")) qParams.set("limit", "100");
 
     setStatus("Grabbing Submissions from Arctic Shift...", "loading");
     try {
       const res = await fetch(`${this.baseUrl}/api/posts/search?${qParams.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const posts = json.data || [];
       const content = document.getElementById("content");
-      content.innerHTML = posts.map(renderSubmission).join("");
+      content.innerHTML = posts.length ? posts.map(renderSubmission).join("") : "<p style='padding:20px;text-align:center;color:#7c7c7c;'>No submissions found.</p>";
       setStatus("Done grabbing submissions from Arctic Shift", "success");
       renderPagination(posts, params, document.getElementById("paginate"));
+
+      if (params.get("author")) {
+        renderUserProfileBanner(params.get("author"), params.get("mode"), window.currentBackend, posts.length);
+      }
     } catch (e) {
       setStatus(`Error from Arctic Shift: ${e.message}`, "error");
     }
   },
 
   async searchComments(params) {
+    const allowed = ["author", "subreddit", "body", "after", "before", "sort", "limit", "author_flair_text", "link_id", "parent_id"];
     const qParams = new URLSearchParams();
+
     params.forEach((v, k) => {
-      if (k === "q") qParams.set("body", v);
-      else if (v) qParams.set(k, v);
+      if (k === "q" && v) qParams.set("body", v);
+      else if (allowed.includes(k) && v) qParams.set(k, v);
     });
     if (!qParams.has("limit")) qParams.set("limit", "100");
 
     setStatus("Searching comments from Arctic Shift...", "loading");
     try {
       const res = await fetch(`${this.baseUrl}/api/comments/search?${qParams.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const comments = json.data || [];
       const content = document.getElementById("content");
-      content.innerHTML = comments.map(renderProfileComment).join("");
+      content.innerHTML = comments.length ? comments.map(renderProfileComment).join("") : "<p style='padding:20px;text-align:center;color:#7c7c7c;'>No comments found.</p>";
       setStatus("Done searching comments from Arctic Shift", "success");
       renderPagination(comments, params, document.getElementById("paginate"));
+
+      if (params.get("author")) {
+        renderUserProfileBanner(params.get("author"), params.get("mode"), window.currentBackend, comments.length);
+      }
     } catch (e) {
       setStatus(`Error from Arctic Shift: ${e.message}`, "error");
     }
@@ -368,18 +385,25 @@ const Pullpush = {
   async getSubmissions(params) {
     const qParams = new URLSearchParams();
     params.forEach((v, k) => {
-      if (v) qParams.append(k, v);
+      if (!["backend", "mode", "comments", "id"].includes(k) && v) {
+        qParams.append(k, v);
+      }
     });
 
     setStatus("Grabbing Submissions from Pullpush...", "loading");
     try {
       const res = await fetch(`${this.baseUrl}/submission/?${qParams.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const posts = json.data || [];
       const content = document.getElementById("content");
-      content.innerHTML = posts.map(renderSubmission).join("");
+      content.innerHTML = posts.length ? posts.map(renderSubmission).join("") : "<p style='padding:20px;text-align:center;color:#7c7c7c;'>No submissions found.</p>";
       setStatus("Done grabbing submissions from Pullpush", "success");
       renderPagination(posts, params, document.getElementById("paginate"));
+
+      if (params.get("author")) {
+        renderUserProfileBanner(params.get("author"), params.get("mode"), window.currentBackend, posts.length);
+      }
     } catch (e) {
       setStatus(`Error from Pullpush: ${e.message}`, "error");
     }
@@ -388,18 +412,25 @@ const Pullpush = {
   async searchComments(params) {
     const qParams = new URLSearchParams();
     params.forEach((v, k) => {
-      if (v) qParams.append(k, v);
+      if (!["backend", "mode", "comments", "id"].includes(k) && v) {
+        qParams.append(k, v);
+      }
     });
 
     setStatus("Searching comments from Pullpush...", "loading");
     try {
       const res = await fetch(`${this.baseUrl}/comment/?${qParams.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const comments = json.data || [];
       const content = document.getElementById("content");
-      content.innerHTML = comments.map(renderProfileComment).join("");
+      content.innerHTML = comments.length ? comments.map(renderProfileComment).join("") : "<p style='padding:20px;text-align:center;color:#7c7c7c;'>No comments found.</p>";
       setStatus("Done searching comments from Pullpush", "success");
       renderPagination(comments, params, document.getElementById("paginate"));
+
+      if (params.get("author")) {
+        renderUserProfileBanner(params.get("author"), params.get("mode"), window.currentBackend, comments.length);
+      }
     } catch (e) {
       setStatus(`Error from Pullpush: ${e.message}`, "error");
     }
@@ -452,7 +483,7 @@ function renderSearchForm(backend) {
         </label>
         <label for="mode">
           <span class="label">Mode</span>
-          <select id="mode" name="mode" onchange="window.onModeChange(this.value)">
+          <select id="mode" name="mode">
             <option value="submissions">Submissions</option>
             <option value="comments">Comments</option>
           </select>
@@ -473,8 +504,6 @@ window.switchBackend = function(backend) {
   window.currentBackend = backend;
   renderSearchForm(backend);
 };
-
-window.onModeChange = function(mode) {};
 
 window.handleSearchFormSubmit = function(e) {
   if (e && e.preventDefault) e.preventDefault();
@@ -498,7 +527,7 @@ window.onload = () => {
   window.currentBackend = backend;
   renderSearchForm(backend);
 
-  // Populate form fields from URL
+  // Populate form inputs from URL
   urlParams.forEach((val, key) => {
     const el = document.getElementById(key);
     if (el) el.value = val;
@@ -518,13 +547,6 @@ window.onload = () => {
     };
   }
 
-  // Profile banner trigger
-  const author = urlParams.get("author");
-  const mode = urlParams.get("mode");
-  if (author) {
-    renderUserProfileBanner(author, mode, backend);
-  }
-
   // Route Dispatcher
   const threadMatch = window.location.pathname.match(/r\/[^\/]+\/comments\/(\w+)(?:\/[^\/]+)?\/(\w+)?/);
   if (threadMatch) {
@@ -535,6 +557,7 @@ window.onload = () => {
     return;
   }
 
+  const mode = urlParams.get("mode");
   if (urlParams.has("comments")) {
     const postId = urlParams.get("comments");
     const commentId = urlParams.get("id");
