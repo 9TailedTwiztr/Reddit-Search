@@ -190,57 +190,131 @@ async function renderUserProfileBanner(author, currentMode, currentBackend) {
   `;
 }
 
-window.onload=()=>{
+window.onload = () => {
   console.log("Page loaded");
-  const e=window.location.search,t=new URLSearchParams(e);
-  let n=t.get("backend")||"artic_shift";
-  "pushpull"===n&&(n="pullpush"),window.currentBackend=n,T(n),t.delete("backend"),"pullpush"===n?w.backend=y.PULLPUSH:"artic_shift"===n&&(w.backend=y.ARTIC_SHIFT),t.has("limit")||t.set("limit",100),console.log("URL Params: ",t.toString());
-  
-  const r=window.location.pathname.match(/r\/[^\/]+\/comments\/(\w+)(?:\/[^\/]+)?\/(\w+)\/?/);
-  if(console.log("Path Match: ",r),r){
-    const e=r[1],t=r[2];
-    return w.grabComments(e,t),void document.getElementById("content").prepend(w.$el)
+  const e = window.location.search,
+    t = new URLSearchParams(e);
+  let n = t.get("backend") || "artic_shift";
+  "pushpull" === n && (n = "pullpush"),
+    (window.currentBackend = n),
+    T(n),
+    t.delete("backend"),
+    "pullpush" === n
+      ? (w.backend = y.PULLPUSH)
+      : "artic_shift" === n && (w.backend = y.ARTIC_SHIFT),
+    t.has("limit") || t.set("limit", 100),
+    console.log("URL Params: ", t.toString());
+
+  const r = window.location.pathname.match(
+    /r\/[^\/]+\/comments\/(\w+)(?:\/[^\/]+)?\/(\w+)\/?/
+  );
+  if ((console.log("Path Match: ", r), r)) {
+    const e = r[1],
+      t = r[2];
+    return (
+      w.grabComments(e, t),
+      void document.getElementById("content").prepend(w.$el)
+    );
   }
-  
+
   w.onModeChange("submissions");
-  const s=t.get("mode");
+  const s = t.get("mode");
   const authorName = t.get("author");
   if (authorName) {
     renderUserProfileBanner(authorName, s, n);
   }
 
-  "comments"===s?(O(t),t.delete("mode"),w.searchComments(t),w.onModeChange("comments")):null!==t.get("comments")?w.grabComments(t.get("comments"),t.get("id")):("submissions"===s||t.has("subreddit")||t.has("author"))&&(O(t),t.delete("mode"),w.grabSubmissions(t)),document.getElementById("content").prepend(w.$el);
-  
-  const i=document.getElementById("toggle-images-checkbox"),o=document.getElementById("toggle-images-label");
-  window.showImages="true"===localStorage.getItem("showImages"),i&&o?(i.checked=window.showImages,o.textContent=window.showImages?"Hide Images":"Show Images",i.onchange=function(){window.showImages=i.checked,localStorage.setItem("showImages",window.showImages),o.textContent=window.showImages?"Hide Images":"Show Images",window.location.reload()}):window.showImages=!0
+  "comments" === s
+    ? (O(t), t.delete("mode"), w.searchComments(t), w.onModeChange("comments"))
+    : null !== t.get("comments")
+    ? w.grabComments(t.get("comments"), t.get("id"))
+    : ("submissions" === s || t.has("subreddit") || t.has("author")) &&
+      (O(t), t.delete("mode"), w.grabSubmissions(t)),
+    document.getElementById("content").prepend(w.$el);
+
+  const i = document.getElementById("toggle-images-checkbox"),
+    o = document.getElementById("toggle-images-label");
+  (window.showImages = "true" === localStorage.getItem("showImages")),
+    i && o
+      ? ((i.checked = window.showImages),
+        (o.textContent = window.showImages ? "Hide Images" : "Show Images"),
+        (i.onchange = function () {
+          (window.showImages = i.checked),
+            localStorage.setItem("showImages", window.showImages),
+            (o.textContent = window.showImages ? "Hide Images" : "Show Images"),
+            window.location.reload();
+        }))
+      : (window.showImages = !0);
 };
 
-window.onModeChange=e=>w.onModeChange(e);
-window.switchBackend=function(e){
-  const t=document.getElementById("search_form"),n={};
-  t&&Array.from(t.elements).forEach(e=>{e.name&&"submit"!==e.type&&"button"!==e.type&&(n[e.name]=e.value)});
-  let r={...n};
-  "pullpush"===e?(void 0!==r.query&&""!==r.query?(r.q=r.query,delete r.query):void 0!==r.body&&""!==r.body&&(r.q=r.body,delete r.body),"auto"===r.limit&&(r.limit="1000")):"artic_shift"===e&&void 0!==r.q&&(r.query=r.q,r.body=r.q,delete r.q),T(e);
-  const s=document.getElementById("backend");
-  s&&(s.value=e);
-  const i=document.getElementById("search_form");
-  if(i){
-    Object.entries(r).forEach(([e,t])=>{const n=i.elements.namedItem(e);n&&void 0!==n.value&&(n.value=t)});
-    const e=i.elements.namedItem("mode");
-    e&&window.onModeChange(e.value)
+window.onModeChange = (e) => w.onModeChange(e);
+
+window.switchBackend = function (e) {
+  const t = document.getElementById("search_form"),
+    n = {};
+  t &&
+    Array.from(t.elements).forEach((e) => {
+      e.name &&
+        "submit" !== e.type &&
+        "button" !== e.type &&
+        (n[e.name] = e.value);
+    });
+  let r = { ...n };
+  "pullpush" === e
+    ? (void 0 !== r.query && "" !== r.query
+        ? ((r.q = r.query), delete r.query)
+        : void 0 !== r.body && "" !== r.body && ((r.q = r.body), delete r.body),
+      "auto" === r.limit && (r.limit = "1000"))
+    : "artic_shift" === e &&
+      void 0 !== r.q &&
+      ((r.query = r.q), (r.body = r.q), delete r.q),
+    T(e);
+  const s = document.getElementById("backend");
+  s && (s.value = e);
+  const i = document.getElementById("search_form");
+  if (i) {
+    Object.entries(r).forEach(([e, t]) => {
+      const n = i.elements.namedItem(e);
+      n && void 0 !== n.value && (n.value = t);
+    });
+    const e = i.elements.namedItem("mode");
+    e && window.onModeChange(e.value);
   }
 };
-window.onArcticShiftFormChanged=()=>{!function(){const e=document.getElementById("author"),t=document.getElementById("subreddit");e&&e.addEventListener("input",E),t&&t.addEventListener("input",E),E()}()};
-window.handleSearchFormSubmit=function(e){
-  if(e&&e.preventDefault){e.preventDefault();}
-  const t=e.target||document.getElementById("search_form"),n=new URLSearchParams;
-  Array.from(t.elements).forEach(e=>{e.name&&!e.disabled&&"submit"!==e.type&&"button"!==e.type&&("checkbox"!==e.type&&"radio"!==e.type||e.checked)&&void 0!==e.value&&null!==e.value&&""!==e.value&&n.append(e.name,e.value)});
-  const r=t.elements.backend?t.elements.backend.value:void 0;
-  r&&n.set("backend",r);
-  const s=t.elements.mode?t.elements.mode.value:void 0;
-  s&&n.set("mode",s);
-  window.location.href=window.location.pathname+"?"+n.toString();
+
+window.onArcticShiftFormChanged = () => {
+  !(function () {
+    const e = document.getElementById("author"),
+      t = document.getElementById("subreddit");
+    e && e.addEventListener("input", E),
+      t && t.addEventListener("input", E),
+      E();
+  })();
+};
+
+window.handleSearchFormSubmit = function (e) {
+  if (e && e.preventDefault) {
+    e.preventDefault();
+  }
+  const t = e.target || document.getElementById("search_form"),
+    n = new URLSearchParams();
+  Array.from(t.elements).forEach((e) => {
+    e.name &&
+      !e.disabled &&
+      "submit" !== e.type &&
+      "button" !== e.type &&
+      (("checkbox" !== e.type && "radio" !== e.type) || e.checked) &&
+      void 0 !== e.value &&
+      null !== e.value &&
+      "" !== e.value &&
+      n.append(e.name, e.value);
+  });
+  const r = t.elements.backend ? t.elements.backend.value : void 0;
+  r && n.set("backend", r);
+  const s = t.elements.mode ? t.elements.mode.value : void 0;
+  s && n.set("mode", s);
+  window.location.href = window.location.pathname + "?" + n.toString();
   return false;
 };
-})()})();
-
+})();
+})();
