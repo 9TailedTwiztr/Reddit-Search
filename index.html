@@ -5,12 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reddit Archive</title>
   <link rel="stylesheet" href="./style.css" />
+  <!-- Marked.js for parsing Reddit markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
-  <!-- Top Navigation -->
+  <!-- Top Navigation Header -->
   <header class="links">
-    <a href="./index.html"><strong>Reddit Archive</strong></a>
+    <a href="./index.html" style="font-weight:700; color:var(--text-primary);">Reddit Archive</a>
     <a href="./index.html" id="back">Reset</a>
     <a href="./about.html">About</a>
     <a href="./changelog.html">Changelog</a>
@@ -19,7 +21,7 @@
         <input type="checkbox" id="toggle-images-checkbox">
         <span class="slider"></span>
       </label>
-      <span id="toggle-images-label" style="font-size: 13px; font-weight: 600; margin-left: 6px;">Show Images</span>
+      <span id="toggle-images-label">Show Images</span>
     </span>
   </header>
 
