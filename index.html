@@ -4,46 +4,29 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reddit Archive</title>
-
-  <!-- Inline SVG Favicon (prevents 404 favicon error) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
-
   <link rel="stylesheet" href="./style.css" />
-
-  <!-- Bootstrap styles used by the forms -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
 </head>
 <body>
-
-  <!-- Top Navigation -->
   <header class="links">
     <a href="./index.html"><strong>Reddit Archive</strong></a>
     <a href="./index.html" id="back">Reset</a>
-    <a href="./about.html" id="back">Help/About/Contact</a>
-    <a href="./changelog.html" id="back">Changelog</a>
+    <a href="./about.html">About</a>
+    <a href="./changelog.html">Changelog</a>
     <span id="toggle-images-container">
       <label class="switch">
         <input type="checkbox" id="toggle-images-checkbox">
-        <span class="slider round"></span>
+        <span class="slider"></span>
       </label>
       <span id="toggle-images-label" style="font-size: 13px; font-weight: 600; margin-left: 6px;">Show Images</span>
     </span>
   </header>
-
-  <!-- Notice Banner -->
   <div id="highlight">
     <strong>Archive Mode:</strong> Arctic Shift and Pullpush backends active. Search submissions, full comment trees, and user archives.
   </div>
-
   <div class="error" id="error"></div>
-
-  <!-- Search Filter Form -->
   <div class="left">
     <div id="searchform"></div>
   </div>
-
-  <!-- Main Feed Container -->
   <div id="status"></div>
   <div id="reddit_link"></div>
   <div id="paginate"></div>
@@ -51,7 +34,6 @@
     <div id="comments"></div>
   </div>
   <div id="orphans"></div>
-
   <script src="./index.js"></script>
 </body>
 </html>
