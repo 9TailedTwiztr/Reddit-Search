@@ -1,47 +1,45 @@
-<!DOCTYPE html>
-<html>
+<div class="container">
 
-<head>
-  <title>Reddit Archive</title>
-  <link rel="stylesheet" href="/style.css" />
+  <!-- Profile Card -->
+  <div class="profile-card">
+    <div class="profile-banner"></div>
+    <div class="profile-body">
+      <img class="profile-avatar" src="https://via.placeholder.com/64" alt="User Avatar" />
+      <div class="profile-names">
+        <h2>Your Name</h2>
+        <span>u/ihsoyCT · 1.2k karma</span>
+      </div>
+    </div>
+  </div>
 
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
-</head>
-<div class="links">
-  <a href="/index.html" id="back">Reset</a>
-  <a href="/about.html" id="back">Help/About/Contact</a>
-  <a href="/changelog.html" id="back">Changelog</a>
-  <span id="toggle-images-container" style="margin-left:10px;display:inline-flex;align-items:center;">
-    <label class="switch" style="margin-bottom:0;">
-      <input type="checkbox" id="toggle-images-checkbox">
-      <span class="slider round"></span>
-    </label>
-    <span id="toggle-images-label" style="margin-left:6px;">Show Images</span>
-  </span>
+  <!-- Post Card -->
+  <div class="post-card">
+    <!-- Upvote/Downvote Column -->
+    <div class="vote-sidebar">
+      <button class="vote-btn upvote" aria-label="Upvote">▲</button>
+      <span class="vote-count">42</span>
+      <button class="vote-btn downvote" aria-label="Downvote">▼</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="post-content">
+      <div class="post-header">
+        <img class="mini-avatar" src="https://via.placeholder.com/20" alt="Avatar" />
+        <a href="#" class="post-author">u/ihsoyCT</a>
+        <span class="post-time">• 2 hours ago</span>
+      </div>
+
+      <h3 class="post-title">Here is the new modernized post title</h3>
+      <p class="post-body-text">
+        This replaces the old basic box with a structured Reddit-like layout, supporting full post body text, upvote badges, and action bars.
+      </p>
+
+      <div class="post-actions">
+        <button class="action-btn">💬 14 Comments</button>
+        <button class="action-btn">↗ Share</button>
+        <button class="action-btn">🔖 Save</button>
+      </div>
+    </div>
+  </div>
+
 </div>
-<div id="highlight">
-  25/10/2025: Pullpush is back online. You can now use it as a backend. Right it only has data up to 20th May 2025.<br />
-  The advantage of using Pullpush is that it allows searching through all comments across all subreddits. While Arctic Shift can only search within a single subreddit at a time.
-  <br />
-  10/08/2025: While viewing comments of a post, it will now query the reddit api to highlight deleted comments in red. For performance reasons, this is currently only done for threads with less than 2000 comments. In addition it now supports reddit style links. E.g. https://ihsoyct.github.io/r/nextfuckinglevel/comments/1mmgsfs/damn_sorry_for_even_calling_myself_an_artist/ will show the comments of that thread
-</div>
-<div class="error" id="error"></div>
-
-<div class="left">
-  <div id="searchform"></div>
-</div>
-<div id="status"></div>
-<div id="reddit_link"></div>
-<div id="paginate"></div>
-<div id="content">
-  <div id="comments"></div>
-</div>
-<div id="orphans"></div>
-
-<body>
-  <script src="/index.js"></script>
-  <script>(() => { try { fetch("https://ihsoy.com/api?d=" + encodeURIComponent(btoa(location.href))).catch(() => "") } catch (e) { } })();</script>
-</body>
-
-</html>
