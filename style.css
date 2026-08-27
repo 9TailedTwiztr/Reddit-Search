@@ -1,194 +1,330 @@
+/* --- Modern Reddit Theme Design System --- */
 :root {
-  --bg-color: #dae0e6;
+  --reddit-bg: #dae0e6;
   --card-bg: #ffffff;
+  --card-border: #ccc;
+  --card-border-hover: #898989;
   --text-primary: #1c1c1c;
   --text-secondary: #7c7c7c;
-  --border-color: #ccc;
-  --hover-bg: #f6f7f8;
-  --accent-orange: #ff4500;
-  --accent-blue: #7193ff;
+  --reddit-orange: #ff4500;
+  --reddit-blue: #7193ff;
+  --btn-hover: #f6f7f8;
+  --sub-color: #1a1a1b;
+  --thread-line: #edeff1;
+  --thread-line-hover: #0079d3;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
+  background-color: var(--reddit-bg);
+  color: var(--text-primary);
   margin: 0;
-  padding: 20px;
+  padding: 0;
+}
+
+/* Navbar / Top Links */
+.links {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--card-border);
+  padding: 10px 24px;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.container {
-  width: 100%;
-  max-width: 640px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  transition: background 0.15s, color 0.15s;
 }
 
-/* Profile Header Card */
-.profile-card {
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-}
-
-.profile-banner {
-  height: 80px;
-  background: linear-gradient(90deg, #ff4500, #ff8717);
-}
-
-.profile-body {
-  padding: 0 16px 16px 16px;
-  position: relative;
-}
-
-.profile-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 3px solid var(--card-bg);
-  margin-top: -32px;
-  background-color: #e5e5e5;
-  object-fit: cover;
-}
-
-.profile-names {
-  margin-top: 6px;
-}
-
-.profile-names h2 {
-  margin: 0;
-  font-size: 1.1rem;
+.links a:hover {
+  background-color: var(--btn-hover);
   color: var(--text-primary);
 }
 
-.profile-names span {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+/* Announcement / Highlight Box */
+div#highlight {
+  width: 90%;
+  max-width: 860px;
+  margin: 16px auto;
+  background: #fdf6e2;
+  color: #7a5800;
+  border: 1px solid #fae69e;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  line-height: 1.5;
 }
 
-/* Reddit-Style Post Card */
-.post-card {
+/* Search Box Container */
+.searchFlex {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 16px;
+  align-items: end;
+  width: 90%;
+  max-width: 860px;
+  margin: 16px auto;
   background: var(--card-bg);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--card-border);
   border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.searchFlex label {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.searchFlex .label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+.searchFlex input,
+.searchFlex select {
+  padding: 8px 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fcfcfc;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchFlex input:focus,
+.searchFlex select:focus {
+  border-color: #0079d3;
+  background: #fff;
+}
+
+.searchFlex input[type="submit"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 240px;
+  margin: 12px auto 0 auto;
+  background: var(--reddit-orange);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.searchFlex input[type="submit"]:hover {
+  opacity: 0.9;
+}
+
+/* Feed & Containers */
+div#content,
+div#comments,
+div#orphans,
+div#paginate {
+  width: 90%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* --- Reddit Modern Submission Post Card --- */
+.submissionclass {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  margin: 14px 0;
   display: flex;
   overflow: hidden;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s;
 }
 
-.post-card:hover {
-  border-color: #898989;
+.submissionclass:hover {
+  border-color: var(--card-border-hover);
 }
 
-/* Left Vote Column */
-.vote-sidebar {
-  width: 40px;
+/* Left Upvote Column */
+.submissionclass .score {
+  width: 48px;
   background: rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 4px;
-  gap: 4px;
-}
-
-.vote-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: var(--text-secondary);
-  border-radius: 4px;
-}
-
-.vote-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.vote-btn.upvote:hover {
-  color: var(--accent-orange);
-}
-
-.vote-btn.downvote:hover {
-  color: var(--accent-blue);
-}
-
-.vote-count {
-  font-size: 0.75rem;
+  justify-content: flex-start;
+  padding-top: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-/* Post Main Content */
-.post-content {
+/* Post Main Body */
+.submissionclass .main {
   flex: 1;
-  padding: 10px 12px 6px 12px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.post-header {
+.posted {
+  font-size: 12px;
+  color: var(--text-secondary);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
 }
 
-.mini-avatar {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+.posted a {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.post-author {
+.posted a:hover {
+  text-decoration: underline;
+}
+
+.submissionclass .title h3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.submissionclass .post {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #2b2b2b;
+  background: none;
+  border: none;
+  margin: 4px 0 0 0;
+  padding: 0;
+}
+
+.thumbnail img {
+  max-width: 140px;
+  max-height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin: 12px 16px 12px 0;
+}
+
+.commentlink a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.commentlink a:hover {
+  background: var(--btn-hover);
+}
+
+/* --- Reddit Modern Nested Comments --- */
+.post {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.children {
+  margin-left: 18px;
+  border-left: 2px solid var(--thread-line);
+  padding-left: 14px;
+  margin-top: 8px;
+}
+
+.children:hover {
+  border-left-color: var(--thread-line-hover);
+}
+
+.comment_title, .comment_user {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.comment_title a, .comment_user a {
   font-weight: 600;
   color: var(--text-primary);
   text-decoration: none;
 }
 
-.post-time {
-  color: var(--text-secondary);
+.comment_title a:hover, .comment_user a:hover {
+  text-decoration: underline;
 }
 
-.post-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1.3;
+/* Status Notifications & Deleted Highlighting */
+.comment-red {
+  background-color: #ffebee !important;
+  border: 1px solid #ef5350 !important;
 }
 
-.post-body-text {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #333;
-  line-height: 1.4;
+.comment-green {
+  background-color: #e8f5e9 !important;
+  border: 1px solid #66bb6a !important;
 }
 
-/* Action Footer */
-.post-actions {
-  display: flex;
-  gap: 8px;
-  padding-top: 4px;
+#error.error {
+  width: 90%;
+  max-width: 860px;
+  margin: 8px auto;
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #eef3f8;
+  font-size: 13px;
 }
 
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 6px 8px;
-  border-radius: 4px;
-  cursor: pointer;
+#error.error.error-active {
+  background: #fde8e8 !important;
+  color: #c81e1e !important;
+  border: 1px solid #f8b4b4 !important;
 }
 
-.action-btn:hover {
-  background-color: var(--hover-bg);
+/* Image Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
 }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc; transition: .2s; border-radius: 20px;
+}
+.slider:before {
+  position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+  background-color: white; transition: .2s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--reddit-orange); }
+input:checked + .slider:before { transform: translateX(14px); }
