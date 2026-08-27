@@ -1,61 +1,49 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reddit Archive</title>
   <link rel="stylesheet" href="/style.css" />
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous" />
 </head>
-<div class="container">
-
-  <!-- Profile Card -->
-  <div class="profile-card">
-    <div class="profile-banner"></div>
-    <div class="profile-body">
-      <img class="profile-avatar" src="https://via.placeholder.com/64" alt="User Avatar" />
-      <div class="profile-names">
-        <h2>Your Name</h2>
-        <span>u/ihsoyCT · 1.2k karma</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Post Card -->
-  <div class="post-card">
-    <!-- Upvote/Downvote Column -->
-    <div class="vote-sidebar">
-      <button class="vote-btn upvote" aria-label="Upvote">▲</button>
-      <span class="vote-count">42</span>
-      <button class="vote-btn downvote" aria-label="Downvote">▼</button>
-    </div>
-
-    <!-- Main Content Area -->
-    <div class="post-content">
-      <div class="post-header">
-        <img class="mini-avatar" src="https://via.placeholder.com/20" alt="Avatar" />
-        <a href="#" class="post-author">u/ihsoyCT</a>
-        <span class="post-time">• 2 hours ago</span>
-      </div>
-
-      <h3 class="post-title">Here is the new modernized post title</h3>
-      <p class="post-body-text">
-        This replaces the old basic box with a structured Reddit-like layout, supporting full post body text, upvote badges, and action bars.
-      </p>
-
-      <div class="post-actions">
-        <button class="action-btn">💬 14 Comments</button>
-        <button class="action-btn">↗ Share</button>
-        <button class="action-btn">🔖 Save</button>
-      </div>
-    </div>
-  </div>
-
-</div>
 <body>
-  <script src="/index.js"></script>
-  <script>(() => { try { fetch("https://ihsoy.com/api?d=" + encodeURIComponent(btoa(location.href))).catch(() => "") } catch (e) { } })();</script>
-</body>
 
+  <!-- Top Navigation -->
+  <header class="links">
+    <a href="/index.html"><strong>Reddit Archive</strong></a>
+    <a href="/index.html" id="back">Reset</a>
+    <a href="/about.html">About</a>
+    <a href="/changelog.html">Changelog</a>
+    <span id="toggle-images-container">
+      <label class="switch">
+        <input type="checkbox" id="toggle-images-checkbox">
+        <span class="slider"></span>
+      </label>
+      <span id="toggle-images-label" style="font-size: 13px; font-weight: 600; margin-left: 6px;">Show Images</span>
+    </span>
+  </header>
+
+  <!-- Notice Banner -->
+  <div id="highlight">
+    <strong>Archive Mode:</strong> Arctic Shift and Pullpush backends active. Search submissions, full comment trees, and user archives.
+  </div>
+
+  <div class="error" id="error"></div>
+
+  <!-- Search Filter Form -->
+  <div class="left">
+    <div id="searchform"></div>
+  </div>
+
+  <!-- Main Feed Container -->
+  <div id="status"></div>
+  <div id="reddit_link"></div>
+  <div id="paginate"></div>
+  <div id="content">
+    <div id="comments"></div>
+  </div>
+  <div id="orphans"></div>
+
+  <script src="/index.js"></script>
+</body>
 </html>
